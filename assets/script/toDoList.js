@@ -1,89 +1,82 @@
-function toDoList() {
-    function pageStatic() {
-        const body = document.querySelector('body');
-        function recebeEvento(event) {
+function toDoList(){
+    function pageStatic(){
+        const body=document.body;
+        function recebeEvento(event){
             event.preventDefault();
         }
-        body.addEventListener('click', recebeEvento);
+        body.addEventListener('click',recebeEvento);
+    }
+    const inputContentRes=document.querySelector('.input-content');
+    const result=document.querySelector('.result');
 
-    }
-    const result = document.querySelector('.result');
-    const inputContentRes = document.querySelector('.input-content');
-    function clear() {
-        inputContentRes.value = ' ';
-        inputContentRes.focus();
-    }
-    function addElent() {
-        const elementLi = document.createElement('li');
-        elementLi.setAttribute('class', 'li-content');
+    document.addEventListener('click',function(event){
+        const recebeEvento=event.target;
+        if(recebeEvento.classList.contains('button-add')){
+            if(!inputContentRes.value||inputContentRes.value==0){
+                return;
+            }else{
+                addList(inputContentRes.value);
+                clearInput();
+            }
+        }else if (recebeEvento.classList.contains('button-clear')){
+            recebeEvento.parentElement.remove();
+            saveArray();
+        }
+    })
+    document.addEventListener('keypress',function(event){
+        const recebeEvento=event.target;
+        if(recebeEvento.classList.contains('enter')){
+            if(!inputContentRes.value||inputContentRes.value==0){
+                return;
+            }else{
+                addList(inputContentRes.value);
+                clearInput();
+            }
+    }     })
+    readArray();
+    function createElementLi(){
+        const elementLi=document.createElement('li');
+        elementLi.setAttribute('class','li-content');
         return elementLi;
     }
-    function button(elementLi) {
-        elementLi.innerText += ' ';
-        const elementButton = document.createElement('button');
-        elementButton.setAttribute('class', 'button-clear');
-        elementButton.setAttribute('title', 'Apagar esta tarefa');
-        elementButton.innerText = 'Apagar';
-        elementLi.appendChild(elementButton);
+    function addList(content){
+        const element=createElementLi();
+        element.innerText=content;
+        buttonAdd(element);
+        result.appendChild(element);  
+        saveArray();
+      
     }
-    function addList(content) {
-        const element = addElent();
-        element.innerText = content;
-        button(element);
-        result.appendChild(element);
-        clear();
-        saveContent();
+    function clearInput(){
+        inputContentRes.value=" ";
+        inputContentRes.focus();
     }
-    result.addEventListener('click', function (event) {
-        const recEvento = event.target;
-        if (recEvento.classList.contains('button-clear')) {
-            recEvento.parentElement.remove();
-            saveContent();
-        }
-    })
-    document.addEventListener('click', function (event) {
-        const recEvento = event.target;
-        if (recEvento.classList.contains('button-add')) {
-            if (!inputContentRes.value || inputContentRes.value == 0) {
-                return;
-            } else {
-                addList(inputContentRes.value);
-            }
-        }
-    })
-    document.addEventListener('keypress', function (event) {
-        const recEvento = event.target;
-        if (recEvento.classList.contains('enter')) {
-            if (!inputContentRes.value || inputContentRes.value == 0) {
-                return;
-            } else {
-                addList(inputContentRes.value);
-            } 
-        }
-    })
+    function buttonAdd(elementLi){
+        const buttonClear=document.createElement('button');
+        buttonClear.setAttribute('class','button-clear');
+        buttonClear.setAttribute('title','Apagar tarefa');
+        buttonClear.innerText='Apagar';
+        elementLi.appendChild(buttonClear);
+    }
     pageStatic();
-    addContent();
-    function addContent() {
-        const content = localStorage.getItem('content');
-        const listTarefas = JSON.parse(content);
-        for (let tarefa of listTarefas) {
-            addList(tarefa);
+    function saveArray(){
+        const contentRes=result.querySelectorAll('.li-content');
+        const contentSave=[];
+        for(let content of contentRes){
+            let contentText=content.innerText;
+            contentText=contentText.replace('Apagar','').trim();
+            contentSave.push(contentText);
+        }
+        const contentJson=JSON.stringify(contentSave);
+        localStorage.setItem('contentResult',contentJson);
+    }
+    function readArray(){
+        const contentRes = localStorage.getItem('contentResult');
+        const contentSave=JSON.parse(contentRes);
+        for(let content of contentSave){
+            addList(content);
         }
     }
-    function saveContent() {
-        const tarefas = result.querySelectorAll('.li-content');
-        const listTarefas = [];
-    
-        for (let tarefa of tarefas) {
-            let tarefaTexto = tarefa.innerText;
-            tarefaTexto = tarefaTexto.replace('Apagar', '').trim();
-            listTarefas.push(tarefaTexto);
-        }
-        const contentJason = JSON.stringify(listTarefas);
-        localStorage.setItem('content', contentJason);
-    }
-
 }
 toDoList();
-
 
